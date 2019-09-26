@@ -78,6 +78,10 @@ func (t *Type) Catch(fn func(e Exception)) {
 	}
 }
 
+func rethrow(v interface{}) {
+	panic(v)
+}
+
 func (t *Type) catch(v interface{}, fn func(e Exception)) {
 	e := convert(v)
 
@@ -87,5 +91,5 @@ func (t *Type) catch(v interface{}, fn func(e Exception)) {
 	}
 
 	// No match, rethrow the original value
-	panic(v)
+	rethrow(v)
 }

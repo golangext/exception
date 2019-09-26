@@ -37,6 +37,10 @@ type Type struct {
 	global         error
 }
 
+func (t *Type) String() string {
+	return fmt.Sprintf("%v: %v", t.name, t.description)
+}
+
 func (t *Type) Extend(name string, traits Traits) *Type {
 	if !t.allowSubclass {
 		panic(fmt.Errorf("extending a sealed type (%v)", t.description))
@@ -53,6 +57,7 @@ func newType(name string, parent *Type, traits Traits) *Type {
 	t.name = name
 	t.id = atomic.AddInt64(&nextId, 1)
 	t.global = traits.Global
+	t.parent = parent
 
 	if traits.HttpStatusCode != 0 {
 		t.httpStatusCode = traits.HttpStatusCode

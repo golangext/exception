@@ -1,6 +1,9 @@
 package exception
 
-import "unsafe"
+import (
+	"runtime"
+	"unsafe"
+)
 
 var knownGlobalErrObjects = make(objectMap)
 var knownGlobalErrTypes = make(typeMap)
@@ -13,6 +16,7 @@ func (typeMap) id(v interface{}) uintptr {
 
 	ifPtr := (*iface)(unsafe.Pointer(&v))
 	key := ifPtr.typePtr
+	runtime.KeepAlive(v)
 	return key
 }
 
@@ -24,6 +28,7 @@ func (objectMap) id(v interface{}) uintptr {
 
 	ifPtr := (*iface)(unsafe.Pointer(&v))
 	key := ifPtr.dataPtr
+	runtime.KeepAlive(v)
 	return key
 }
 
@@ -57,8 +62,8 @@ func (a typeMap) Get(err interface{}) *Type {
 	return nil
 }
 
-func knownGlobalObject(err error, parent *Type) *Type {
-	t := parent.extend("", Traits{
+func (parent *Type) extendErrObj(name string, err error) *Type {
+	t := parent.extend(name, Traits{
 		AllowSubclass: False,
 		AllowThrow:    True,
 		Global:        err,
@@ -68,11 +73,10 @@ func knownGlobalObject(err error, parent *Type) *Type {
 	return t
 }
 
-func knownGlobalType(err error, parent *Type) *Type {
+func (parent *Type) extendErrType(name string, err error) *Type {
 	t := parent.extend("", Traits{
 		AllowSubclass: False,
 		AllowThrow:    True,
-		Global:        err,
 	})
 
 	knownGlobalErrTypes.Add(err, t)
