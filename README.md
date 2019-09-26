@@ -1,2 +1,2 @@
 # exception
-Something that looks like exceptions
+Something that looks like exceptions in golang
